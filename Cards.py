@@ -1,15 +1,4 @@
-#
-# This module has classes for a set of playing cards and a deck of cards
-#
-# the Card class
-# methods:
-#	__init__: generate a card with given suit rank
-#	__str__: print the given card
-#   cmp: compare 2 cards, return 1, 0, -1 as appropriate
-#			order is S, H, D, C (suits) and A, K, Q, J, 10, ... (ranks)
-#	rcmp: compare the rank of 2 cards, return 1, 0, -1 as appropriate
-#	scmp: compare the suit of 2 cards, return 1, 0, -1 as appropriate
-#
+# Card and Deck class definitions
 class Card:
     # first, the suits and ranks, in order
     # note the order is important as it is used to compare
@@ -56,17 +45,6 @@ class Card:
         return self.rcmp(c)
 
 
-#
-# the Deck class
-# represent it as a list of cards
-# methods:
-#	__init__: initialize deck with 52 cards in order (low to high)
-#	__str__: generate a string of cards with blanks between them
-#   shuffle: shuffle the deck
-# requires:
-#	class Cards (above)
-#	import random (for the shuffling)
-#
 class Deck:
 
     # create a deck of cards
