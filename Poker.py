@@ -9,7 +9,7 @@
 # display win % at the end
 # sort hands in ascending order from left to right
 import sys
-from PokerHand import PokerHand
+from PokerHands import PokerHand
 from Cards import Card
 from Cards import Deck
 deck = Deck()
