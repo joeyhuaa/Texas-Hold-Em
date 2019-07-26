@@ -3,8 +3,7 @@ class Card:
     # first, the suits and ranks, in order
     # note the order is important as it is used to compare
     suits = ["c", "d", "h", "s"]
-    ranks = ["2", "3", "4", "5", "6", "7", "8",
-             "9", "T", "J", "Q", "K", "A"]
+    ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 
     # create a card; default is AS
     def __init__(self, rank="A", suit="s"):
@@ -14,6 +13,13 @@ class Card:
     # generate a string representing the card
     def __str__(self):
         return self.rank + self.suit
+
+    # compare two cards
+    def __eq__(self, other_card):
+        if self.rank == other_card.rank and self.suit == other_card.suit:
+            return True
+        else:
+            return False
 
     # compare suits
     def scmp(self, c):
@@ -63,11 +69,32 @@ class Deck:
     def __len__(self):
         return len(self.cards)
 
-    # shuffle the deck using the random module
+    # return T/F
+    def has(self, card):
+        return self.cards.__contains__(card)
+
+    # reconstruct the deck, the shuffle
+    def shuffle_reset(self):
+        import random as rng
+        # reconstruct the full deck
+        # then shuffle
+        self.__init__()
+        rng.shuffle(self.cards)
+
+    # shuffle the current deck
     def shuffle(self):
         import random as rng
         rng.shuffle(self.cards)
 
-    # deal a random card and remove it from deck
-    def deal(self):
-        return self.cards.pop(0)
+    # deal a card, returns that card
+    def deal(self, card=None):
+        if card is None:
+            return self.cards.pop(0)
+        else:
+            return self.cards.remove(card)
+
+    # remove a specific card from deck, returns nothing
+    def remove(self, card):
+        if self.has(card):
+            self.cards.remove(card)
+

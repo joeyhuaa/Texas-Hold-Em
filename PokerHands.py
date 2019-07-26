@@ -45,7 +45,18 @@ class PokerHand:
         # if the two hands differ in rank
         self_rank = PokerHand.ranks[self.get_rank()]
         other_rank = PokerHand.ranks[other.get_rank()]
-        return self_rank - other_rank
+        if self_rank - other_rank != 0:
+            return self_rank - other_rank
+        else:
+            # if both hands are of the same rank, return difference of total "value" of all cards in each hand
+            self_value = 0
+            other_value = 0
+            for card in zip(self.cards, other.cards):
+                self_value += Card.ranks.index(card[0].rank)
+                other_value += Card.ranks.index(card[1].rank)
+            return self_value - other_value
+
+
 
     def get_value(self):
         # add up the total value of all the individual cards

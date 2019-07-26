@@ -12,8 +12,8 @@ import sys
 from PokerHands import PokerHand
 from Cards import Card
 from Cards import Deck
+
 deck = Deck()
-deck.shuffle()
 
 # takes user input and returns cards as a PokerHand object
 def get_starting_hand(input):
@@ -22,6 +22,8 @@ def get_starting_hand(input):
     else:
         card1 = Card(input.split()[0][0], input.split()[0][1])
         card2 = Card(input.split()[1][0], input.split()[1][1])
+        deck.remove(card1)
+        deck.remove(card2)
         return PokerHand([card1, card2])
 
 # combines hole cards and community cards to find the best 5-card hand
@@ -50,9 +52,10 @@ def get_best_hand(holecards, commcards):
     return hands[len(hands)-1]
 
 def display_outcome(hero, vill):
-    print('Hero hole cards: '+str(hero_hand))
-    print('Vill hole cards: '+str(vill_hand))
-    print('Community cards: '+str(community))
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print('Hero hole cards:', str(hero_hand))
+    print('Vill hole cards:', str(vill_hand))
+    print('Community cards:', str(community))
 
     result = hero.rcmp(vill)
 
@@ -64,31 +67,36 @@ def display_outcome(hero, vill):
         print('Tie')
 
 def simulate():
+    deck.shuffle()
     try:
         # input
         hero_holecards = input('Enter hole cards for hero, or "r" for a random hand: ')
         vill_holecards = input('Enter hole cards for villain, or "r" for a random hand: ')
-        # num_games = input('Number of games: ')
+        num_games = int(input('Number of games: '))
 
         # retrieve starting hands
-        global hero_hand
-        hero_hand = get_starting_hand(hero_holecards)
-        global vill_hand
-        vill_hand = get_starting_hand(vill_holecards)
+        for n in range(num_games):
+            global hero_hand
+            hero_hand = get_starting_hand(hero_holecards)
+            global vill_hand
+            vill_hand = get_starting_hand(vill_holecards)
 
-        # deal community cards
-        global community
-        community = PokerHand([deck.deal() for i in range(5)])
+            # deal community cards
+            global community
+            community = PokerHand([deck.deal() for _ in range(5)])
 
-        # find the best hand
-        hero_besthand = get_best_hand(hero_hand, community)
-        vill_besthand = get_best_hand(vill_hand, community)
+            # find the best hand
+            hero_besthand = get_best_hand(hero_hand, community)
+            vill_besthand = get_best_hand(vill_hand, community)
 
-        # display the winner
-        display_outcome(hero_besthand, vill_besthand)
+            # display the winner
+            display_outcome(hero_besthand, vill_besthand)
+
+            # reset
+            deck.shuffle_reset()
 
     except TypeError:
-        print('Just enter a goddamn number.')
+        print('Just enter a damn number xD')
     except EOFError:
         sys.exit(0)
 
@@ -96,5 +104,10 @@ def main():
     simulate()
 
 main()
+
+## BUGS ##
+
+
+
 
 
