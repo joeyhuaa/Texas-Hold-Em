@@ -15,6 +15,11 @@ from Cards import Deck
 
 deck = Deck()
 
+def calc_win_percentage(wins):
+    hero_wr = wins.count('h') / len(wins)
+    vill_vr = wins.count('v') / len(wins)
+    return [hero_wr, vill_vr]
+
 # takes user input and returns cards as a PokerHand object
 def get_starting_hand(input):
     if input == 'r':
@@ -51,23 +56,32 @@ def get_best_hand(holecards, commcards):
     # return the last hand because it's the best hand??
     return hands[len(hands)-1]
 
-def display_outcome(hero, vill):
-    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    print('Hero hole cards:', str(hero_hand))
-    print('Vill hole cards:', str(vill_hand))
-    print('Community cards:', str(community))
-
+def get_outcome(hero, vill, wins, display=True):
     result = hero.rcmp(vill)
 
     if result > 0:
-        print('Hero wins with ' + hero.get_rank())
+        wins.append('h')
     elif result < 0:
-        print('Villain wins with ' + vill.get_rank())
+        wins.append('v')
     else:
-        print('Tie')
+        wins.append('t')
+
+    if display is True:
+        print('~'*20)
+        print('Hero hole cards:', str(hero_hand))
+        print('Vill hole cards:', str(vill_hand))
+        print('Community cards:', str(community))
+
+        if result > 0:
+            print('Hero wins with ' + hero.get_rank())
+        elif result < 0:
+            print('Villain wins with ' + vill.get_rank())
+        else:
+            print('Tie')
 
 def simulate():
     deck.shuffle()
+    wins = []
     try:
         # input
         hero_holecards = input('Enter hole cards for hero, or "r" for a random hand: ')
@@ -90,10 +104,16 @@ def simulate():
             vill_besthand = get_best_hand(vill_hand, community)
 
             # display the winner
-            display_outcome(hero_besthand, vill_besthand)
+            get_outcome(hero_besthand, vill_besthand, wins, display=False)
 
             # reset
             deck.shuffle_reset()
+
+        # display win percentages
+        hero_winrate, vill_winrate = calc_win_percentage(wins)
+        print('~'*20)
+        print("Hero's win rate: " + "%.2f" % (hero_winrate * 100) + '%')
+        print("Villain's win rate: " + "%.2f" % (vill_winrate * 100) + '%')
 
     except TypeError:
         print('Just enter a damn number xD')
