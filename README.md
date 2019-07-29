@@ -4,7 +4,7 @@ Between two players. Currently working on finishing simulation of random run out
 
 Eventually I want to implement combinatorics to calculate odds as well as the ability to play an actual poker game, with decent GUI.
 
-# CHANGELOG
+# Changelog
 
 ### 7-25-19 Commit:
 Fixed the following bugs:
