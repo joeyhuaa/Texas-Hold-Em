@@ -89,7 +89,7 @@ def simulate():
         num_games = int(input('Number of games: '))
 
         # retrieve starting hands
-        for n in range(num_games):
+        for _ in range(num_games):
             global hero_hand
             hero_hand = get_starting_hand(hero_holecards)
             global vill_hand
