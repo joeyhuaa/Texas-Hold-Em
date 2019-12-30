@@ -12,6 +12,8 @@ import sys
 from PokerHands import PokerHand
 from Cards import Card
 from Cards import Deck
+from Player import Player
+from Game import Game
 
 deck = Deck()
 
@@ -54,17 +56,10 @@ def get_best_hand(holecards, commcards):
             i -= 1
 
     # return the last hand because it's the best hand??
-    return hands[len(hands)-1]
+    return hands[-1]
 
-def get_outcome(hero, vill, wins, display=True):
+def get_outcome(hero, vill, display=True):
     result = hero.rcmp(vill)
-
-    if result > 0:
-        wins.append('h')
-    elif result < 0:
-        wins.append('v')
-    else:
-        wins.append('t')
 
     if display is True:
         print('~'*20)
@@ -78,6 +73,13 @@ def get_outcome(hero, vill, wins, display=True):
             print('Villain wins with ' + vill.get_rank())
         else:
             print('Tie')
+
+    if result > 0:
+        return 'h'
+    elif result < 0:
+        return 'v'
+    else:
+        return 't'
 
 def simulate():
     deck.shuffle()
@@ -104,7 +106,7 @@ def simulate():
             vill_besthand = get_best_hand(vill_hand, community)
 
             # display the winner
-            get_outcome(hero_besthand, vill_besthand, wins, display=False)
+            wins.append(get_outcome(hero_besthand, vill_besthand))
 
             # reset
             deck.shuffle_reset()
@@ -120,8 +122,56 @@ def simulate():
     except EOFError:
         sys.exit(0)
 
+
+def play():
+    import time
+    # need to allocate chips
+    # inputs for fold, check, raise
+    # program a simple AI
+    print('You will play heads up against ThreeBetBot. 1-2 blinds, 500 starting stacks.')
+    print('Good luck!')
+    time.sleep(2)
+
+    # start the game
+    deck.shuffle()
+    hero = Player([deck.deal(), deck.deal()])
+    vill = Player([deck.deal(), deck.deal()])
+    game = Game([hero, vill])
+
+
+    # keep playing until someone goes broke
+    while hero.stack > 0 or vill.stack > 0:
+        # initiate
+        game.new_round()
+        print('~' * 10)
+        print('ROUND', game.round)
+
+        # pre-flop
+        hero.bet()
+        print('~' * 10)
+        print('PREFLOP')
+        print('Pot:', game.pot)
+        hero_move = input('Enter bet amount, "c" to check, or "f" to fold.')
+
+        try:
+            hero_bet = int(hero_move)
+            hero.bet(hero_bet)
+        except ValueError:
+            if hero_move == 'c':
+                pass
+            elif hero_move == 'f':
+                print('ThreeBetBot wins', game.pot)
+                continue  # next round
+
+        # flop
+        community = PokerHand([deck.deal() for _ in range(3)])
+
+
+
 def main():
-    simulate()
+    mode = input('Enter "p" to play, or "s" to simulate:')
+    if mode == 'p': play()
+    elif mode == 's': simulate()
 
 main()
 
