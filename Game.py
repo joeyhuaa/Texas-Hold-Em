@@ -7,7 +7,7 @@ class Game:
         self.round = 0
         self.outcomes = []
         self.players = players
-        self.dealer =
+        # self.dealer =
 
     def new_round(self):
         self.street = 0

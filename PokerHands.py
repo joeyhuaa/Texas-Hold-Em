@@ -56,8 +56,6 @@ class PokerHand:
                 other_value += Card.ranks.index(card[1].rank)
             return self_value - other_value
 
-
-
     def get_value(self):
         # add up the total value of all the individual cards
         # and return the sum

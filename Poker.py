@@ -9,6 +9,8 @@
 # display win % at the end
 # sort hands in ascending order from left to right
 import sys
+import csv
+import time
 from PokerHands import PokerHand
 from Cards import Card
 from Cards import Deck
@@ -17,10 +19,40 @@ from Game import Game
 
 deck = Deck()
 
+# MERGE SORT
+def merge(left, right):
+    if not len(left) or not len(right):
+        return left or right
+
+    result = []
+    i, j = 0, 0
+    while len(result) < len(left) + len(right):
+        if left[i].rcmp(right[j]) < 0:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+        if i == len(left) or j == len(right):
+            result.extend(left[i:] or right[j:])
+            break
+
+    return result
+
+def merge_sort(list):
+    if len(list) < 2:
+        return list
+
+    middle = len(list) // 2
+    left = merge_sort(list[:middle])
+    right = merge_sort(list[middle:])
+
+    return merge(left, right)
+
 def calc_win_percentage(wins):
     hero_wr = wins.count('h') / len(wins)
-    vill_vr = wins.count('v') / len(wins)
-    return [hero_wr, vill_vr]
+    vill_wr = wins.count('v') / len(wins)
+    return [hero_wr, vill_wr]
 
 # takes user input and returns cards as a PokerHand object
 def get_starting_hand(input):
@@ -44,23 +76,16 @@ def get_best_hand(holecards, commcards):
 
     # since five_card_combos is a list of tuples,
     # must turn into a list of PokerHand objects
-    hands = [PokerHand(list(hand_tuple)) for hand_tuple in five_card_combos]
+    # MERGE SORT
+    hands = merge_sort([PokerHand(list(hand_tuple)) for hand_tuple in five_card_combos])
 
-    # insertion sort hands by rank
-    for i in range(1, len(hands)):
-        j = i - 1
-
-        while j >= 0 and hands[i].rcmp(hands[j]) < 0:
-            hands[i], hands[j] = hands[j], hands[i]
-            j -= 1
-            i -= 1
-
-    # return the last hand because it's the best hand??
+    # return the last hand because it's the best hand
     return hands[-1]
 
 def get_outcome(hero, vill, display=True):
     result = hero.rcmp(vill)
 
+    # display result in console if display = True
     if display is True:
         print('~'*20)
         print('Hero hole cards:', str(hero_hand))
@@ -74,6 +99,7 @@ def get_outcome(hero, vill, display=True):
         else:
             print('Tie')
 
+    # return result
     if result > 0:
         return 'h'
     elif result < 0:
@@ -83,45 +109,56 @@ def get_outcome(hero, vill, display=True):
 
 def simulate():
     deck.shuffle()
-    wins = []
+    outcomes = []
+    # winrates = []   # this will hold all the winrates after each round of games
+
     try:
         # input
         hero_holecards = input('Enter hole cards for hero, or "r" for a random hand: ')
         vill_holecards = input('Enter hole cards for villain, or "r" for a random hand: ')
         num_games = int(input('Number of games: '))
+        num_rounds = int(input('Number of rounds of games: '))
 
         # retrieve starting hands
-        for _ in range(num_games):
-            global hero_hand
-            hero_hand = get_starting_hand(hero_holecards)
-            global vill_hand
-            vill_hand = get_starting_hand(vill_holecards)
+        for round in range(num_rounds):
+            for _ in range(num_games):
+                global hero_hand
+                hero_hand = get_starting_hand(hero_holecards)
+                global vill_hand
+                vill_hand = get_starting_hand(vill_holecards)
 
-            # deal community cards
-            global community
-            community = PokerHand([deck.deal() for _ in range(5)])
+                # deal community cards
+                global community
+                community = PokerHand([deck.deal() for _ in range(5)])
 
-            # find the best hand
-            hero_besthand = get_best_hand(hero_hand, community)
-            vill_besthand = get_best_hand(vill_hand, community)
+                # find the best hand
+                hero_besthand = get_best_hand(hero_hand, community)
+                vill_besthand = get_best_hand(vill_hand, community)
 
-            # display the winner
-            wins.append(get_outcome(hero_besthand, vill_besthand))
+                # display the winner
+                outcomes.append(get_outcome(hero_besthand, vill_besthand, display=False))
 
-            # reset
-            deck.shuffle_reset()
+                # reset
+                deck.shuffle_reset()
 
-        # display win percentages
-        hero_winrate, vill_winrate = calc_win_percentage(wins)
-        print('~'*20)
-        print("Hero's win rate: " + "%.2f" % (hero_winrate * 100) + '%')
-        print("Villain's win rate: " + "%.2f" % (vill_winrate * 100) + '%')
+            # display win percentages
+            hero_winrate, vill_winrate = calc_win_percentage(outcomes)
 
-    except TypeError:
-        print('Just enter a damn number xD')
+            # winrates.append((hero_winrate, vill_winrate))  # append in the form of a tuple
+            # print('~'*20)
+            # print("Hero's win rate: " + "%.2f" % (hero_winrate * 100) + '%')
+            # print("Villain's win rate: " + "%.2f" % (vill_winrate * 100) + '%')
+
+            print('finished with round', round)
+
+            with open('simulation-winrates.csv', 'a') as f:
+                w = csv.writer(f)
+                w.writerow([str(hero_winrate), str(vill_winrate)])
+
+    # except TypeError:
+    #     print('Just enter a damn number xD')
     except EOFError:
         sys.exit(0)
-
 
 def play():
     import time
@@ -165,8 +202,6 @@ def play():
 
         # flop
         community = PokerHand([deck.deal() for _ in range(3)])
-
-
 
 def main():
     mode = input('Enter "p" to play, or "s" to simulate:')
