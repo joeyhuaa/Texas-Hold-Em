@@ -59,6 +59,7 @@ def get_starting_hand(input):
     if input == 'r':
         return PokerHand([deck.deal(), deck.deal()])
     else:
+        print(input)
         card1 = Card(input.split()[0][0], input.split()[0][1])
         card2 = Card(input.split()[1][0], input.split()[1][1])
         deck.remove(card1)
@@ -110,7 +111,7 @@ def get_outcome(hero, vill, display=True):
 def simulate():
     deck.shuffle()
     outcomes = []
-    # winrates = []   # this will hold all the winrates after each round of games
+    winrates = []   # this will hold all the winrates after each round of games
 
     try:
         # input
@@ -144,12 +145,12 @@ def simulate():
             # display win percentages
             hero_winrate, vill_winrate = calc_win_percentage(outcomes)
 
-            # winrates.append((hero_winrate, vill_winrate))  # append in the form of a tuple
-            # print('~'*20)
-            # print("Hero's win rate: " + "%.2f" % (hero_winrate * 100) + '%')
-            # print("Villain's win rate: " + "%.2f" % (vill_winrate * 100) + '%')
+            winrates.append((hero_winrate, vill_winrate))  # append in the form of a tuple
+            print('~'*20)
+            print("Hero's win rate: " + "%.2f" % (hero_winrate * 100) + '%')
+            print("Villain's win rate: " + "%.2f" % (vill_winrate * 100) + '%')
 
-            print('finished with round', round)
+            # print('finished with round', round)
 
             with open('simulation-winrates.csv', 'a') as f:
                 w = csv.writer(f)
@@ -205,6 +206,7 @@ def play():
 
 def main():
     mode = input('Enter "p" to play, or "s" to simulate:')
+    print(mode)
     if mode == 'p': play()
     elif mode == 's': simulate()
 
